@@ -1,0 +1,53 @@
+Устанавливаем WSL2
+
+Заходим в терминал wsl и выполняем следующие команды
+sudo apt-get update
+sudo apt-get install build-essential python3-dev libpq-dev
+
+Создаем виртуальное окружение и активируем его:
+sudo apt-get install python3-venv
+python3 -m venv .venv
+source .venv/bin/activate
+
+Обновляем pip:
+pip install pip -U
+
+
+Установка как в документации: https://airflow.apache.org/docs/apache-airflow/stable/installation/installing-from-pypi.html
+pip install "apache-airflow[postgres]==2.10.4" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.10.4/constraints-3.8.txt"
+
+
+export AIRFLOW_HOME=~/airflow-data
+
+airflow db init
+
+cd airflow-data
+
+nano airflow.cfg
+
+Заменить путь к дагам на:
+/mnt/c/Dlana/docker_airflow/dags
+
+airflow db reset
+
+создаем юзера:
+airflow users create \
+--username airflow \
+--firstname Margarita \
+--lastname K \
+--role Admin \
+--email email@example.com \
+--password airflow
+
+Запускаем вебсервер:
+airflow webserver -p 8080
+
+
+Открываем второй терминал wsl и запускаем шедулер:
+source .venv/bin/activate
+export AIRFLOW_HOME=~/airflow-data
+airflow scheduler
+
+
+
+
