@@ -19,16 +19,43 @@ pip install "apache-airflow[postgres]==2.10.4" --constraint "https://raw.githubu
 
 export AIRFLOW_HOME=~/airflow-data
 
-airflow db init
+Установка базы данных postgresql:
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+Заходим в Postgres:
+sudo -u postgres psql
 
+Из офф документации https://airflow.apache.org/docs/apache-airflow/stable/howto/set-up-database.html#database-uri
+Создаем БД и юзера для airflow:
+CREATE DATABASE airflow_db;
+CREATE USER airflow_user WITH PASSWORD 'airflow_pass';
+GRANT ALL PRIVILEGES ON DATABASE airflow_db TO airflow_user;
+GRANT ALL ON SCHEMA public TO airflow_user;
+\q
+
+
+Отредактировать конфиг airflow:
 cd airflow-data
-
 nano airflow.cfg
 
 Заменить путь к дагам на:
-/mnt/c/Dlana/docker_airflow/dags
+dags_folder = /mnt/c/Dlana/docker_airflow/dags
 
-airflow db reset
+Отключить загрузку примеров дагов:
+load_examples = False
+
+Изменить executor с:
+executor = SequentialExecutor
+на:
+executor = LocalExecutor
+
+Изменить базу данных с sqlite:
+sql_alchemy_conn = sqlite:////home/margarita/airflow-data/airflow.db
+на postgresql+psycopg2:
+sql_alchemy_conn = postgresql+psycopg2://airflow_user:airflow_pass@localhost/airflow_db
+
+проверить соединение к БД:
+psql -U airflow_user -h localhost -d airflow_db
 
 создаем юзера:
 airflow users create \
